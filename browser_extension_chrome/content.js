@@ -67,3 +67,45 @@ document.addEventListener('click', function(event) {
         });
         }
     });
+
+
+    
+// Create the GUI container
+let guiContainer = document.createElement('div');
+guiContainer.id = 'custom-gui';
+
+// Set styles to make it overlay the webpage
+guiContainer.style.position = 'fixed';
+guiContainer.style.top = '20px';
+guiContainer.style.right = '20px';
+guiContainer.style.zIndex = '10000';  // Make sure it's on top of other elements
+guiContainer.style.width = '300px';
+guiContainer.style.height = '150px';
+guiContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+guiContainer.style.border = '1px solid #ccc';
+guiContainer.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.1)';
+guiContainer.style.padding = '10px';
+guiContainer.style.fontFamily = 'Arial, sans-serif';
+
+// Create a close button
+let closeButton = document.createElement('button');
+closeButton.textContent = 'Close';
+closeButton.style.position = 'absolute';
+closeButton.style.top = '5px';
+closeButton.style.right = '5px';
+closeButton.onclick = function() {
+  document.body.removeChild(guiContainer);
+};
+
+// Add the close button to the container
+guiContainer.appendChild(closeButton);
+
+// Add some content (e.g., a form or message)
+let message = document.createElement('div');
+message.textContent = 'Hello, this is your custom GUI!';
+message.style.marginTop = '40px';
+message.style.textAlign = 'center';
+guiContainer.appendChild(message);
+
+// Append the GUI container to the body
+document.body.appendChild(guiContainer);
