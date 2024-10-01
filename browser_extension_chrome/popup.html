@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Custom GUI</title>
+</head>
+<body>
+  <h1>Custom GUI</h1>
+  <button id="showGui">Show GUI</button>
+
+  <script>
+    document.getElementById('showGui').addEventListener('click', () => {
+      chrome.scripting.executeScript({
+        target: {tabId: chrome.tabs.TAB_ID_NONE}, // active tab
+        files: ['content.js']
+      });
+    });
+  </script>
+</body>
+</html>
