@@ -18,6 +18,8 @@ def new_url():
     url = data['url']
     timestamp = time.time() - start # High-resolution timestamp
     print(f'[{timestamp}] Clicked URL: {url}')
+    with open("URL_clicks.csv", "a+") as f:
+        print(f"{time.time()}, {url}", file=f)
     return jsonify(status='success')
 
 @app.route('/click', methods=['POST'])
