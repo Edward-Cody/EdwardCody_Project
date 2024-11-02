@@ -22,7 +22,7 @@ if not os.path.exists('static/data'):
 
 # set this to 1 to start a new recording run
 # set this to 0 to see the results of the previous run
-if 1:   
+if 0:   
     for file in os.listdir('data'):os.remove(f'data/{file}')
     for file in os.listdir('static/data'):os.remove(f'static/data/{file}')
     print("All files in data folder removed, beginning new recording")
