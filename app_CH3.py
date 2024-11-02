@@ -35,11 +35,18 @@ def track_mouse():
     global current_page_number
     try:
         while True:
+            # print(f"x,y", file=f) # WHERE I LEFT OFF - TRYING TO ADD X,Y AT TOP OF CSV
             x, y = pyautogui.position()
             with page_number_lock:
                 filename = f"data/mouse{current_page_number}.csv"
+            # Check if file is empty and write header if it is
+            if not os.path.exists(filename) or os.path.getsize(filename) == 0:
+                with open(filename, "w") as f:
+                    print("x,y", file=f)
+            # Append the coordinates to the file
             with open(filename, "a+") as f:
-                print(f"{time.time()}, {x}, {y}", file=f)
+                # print(f"{time.time()}, {x}, {y}", file=f) #with timestamps
+                print(f"{x},{y}", file=f)
     except KeyboardInterrupt:
         print("Mouse tracking stopped.")
 
@@ -112,7 +119,7 @@ def show_results():
 
     # for each mouse coords other than 1 create a heatmap and composite it over the screenshot
     # save the results in the static folder as jpgs and change the code below to use jpgs
-    # instead of pngs
+    # instead of pngs - done (11/1/24)
 
     os.chdir('static/data')
     image_files = glob('*.png')
