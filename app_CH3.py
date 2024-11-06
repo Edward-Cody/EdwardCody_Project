@@ -22,14 +22,21 @@ if not os.path.exists('static/data'):
 
 # set this to 1 to start a new recording run
 # set this to 0 to see the results of the previous run
-if 0:   
+if 1:
     for file in os.listdir('data'):os.remove(f'data/{file}')
     for file in os.listdir('static/data'):os.remove(f'static/data/{file}')
     print("All files in data folder removed, beginning new recording")
 
 # Global variable to store the URL
-current_page_number = 1
+current_page_number = 0
 page_number_lock = threading.Lock()
+
+#CSV setup for 2560x1440 monitor
+header = "x,y"
+UL = "0,0"
+UR = "2560,0"
+LR = "2560,1440"
+LL = "0,1440"
 
 def track_mouse():
     global current_page_number
@@ -42,7 +49,11 @@ def track_mouse():
             # Check if file is empty and write header if it is
             if not os.path.exists(filename) or os.path.getsize(filename) == 0:
                 with open(filename, "w") as f:
-                    print("x,y", file=f)
+                    print(header, file=f)
+                    print(UL, file=f)  #may not be needed?
+                    print(UR, file=f)  #may not be needed?
+                    print(LR, file=f)  #may not be needed?
+                    print(LL, file=f)  #may not be needed?
             # Append the coordinates to the file
             with open(filename, "a+") as f:
                 # print(f"{time.time()}, {x}, {y}", file=f) #with timestamps
