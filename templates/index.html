@@ -5,6 +5,85 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mouse Tracker App</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" target="_blank">
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            
+            form.addEventListener('submit', function(event) {
+                const url = window.location.href; // Get the current page URL
+    
+                fetch('http://localhost:3000/new_url', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ url: url })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Form submission URL logged:', data);
+                })
+                .catch(error => {
+                    console.error('Error logging form submission URL:', error);
+                });
+            });
+        });
+    </script>    
+
+    <!-- <form id="submitForm">
+        <input type="text" id="urlInput" placeholder="https://github.com/Edward-Cody/EdwardCody_Project" value="https://github.com/Edward-Cody/EdwardCody_Project" required>
+        <button type="submit">Submit</button>
+    </form>
+    
+    <script>
+        document.getElementById('submitForm').addEventListener('submit', function (event) {
+            // event.preventDefault(); // Prevent the default form submission
+    
+            const url = document.getElementById('urlInput').value;
+            fetch('http://localhost:3000/new_url', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ url: url }) // Send the URL as JSON
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Response:', data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script> -->
+    
+    <!-- <form action="/new_url" method="POST" onsubmit="return submitJSON(this);">
+        <input type="text" name="url" id="urlInput" placeholder="Enter URL" required>
+        <button type="submit">Submit</button>
+    </form>
+    
+    <script>
+        function submitJSON(form) {
+            const url = document.getElementById('urlInput').value;
+            fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ url: url }) // Send the URL as JSON
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Response:', data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    
+            return false; // Prevent default form submission
+        }
+    </script>     -->
+
 </head>
 <body>
     <div class="container mt-5">

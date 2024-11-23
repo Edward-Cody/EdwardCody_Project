@@ -90,6 +90,7 @@ def start():
     else:
         redirect(url_for('index')) # redirect to the index page if no URL is provided
 
+'''
 @app.route('/new_url', methods=['POST'])
 def new_url():
     print("new_url")
@@ -113,6 +114,118 @@ def new_url():
     # Update the global variable with the new page number
     with page_number_lock:
         current_page_number += 1    
+    
+    return jsonify(status='success')
+'''
+
+'''
+@app.route('/new_url', methods=['POST'])
+def new_url():
+    print("new_url")
+    global current_page_number
+    
+    # Get JSON payload
+    data = request.get_json()
+    
+    # Validate JSON and 'url' key
+    if not data or 'url' not in data:
+        print("Invalid request: 'url' key missing or malformed JSON")
+        return jsonify(status='error', message="'url' key missing or invalid JSON"), 400
+
+    url = data['url']
+    print(f'[{time.time()}] Clicked URL: {url}')  # Log the URL click
+    
+    # Screenshot logic here (same as before)
+    try:
+        with page_number_lock:
+            screenshot = pyautogui.screenshot()
+            screenshot.save(f'static/data/screenshot_page{current_page_number+1}.png')
+            current_page_number += 1
+        print("Screenshot saved successfully.")
+    except Exception as e:
+        print(f"Error taking screenshot: {e}")
+        return jsonify(status='error', message="Failed to take screenshot"), 500
+    
+    # Log the click to the CSV file
+    with open("data/URL_clicks.csv", "a+") as f:
+        print(f"{time.time()}, {url}", file=f)
+    
+    return jsonify(status='success')
+'''
+
+'''
+@app.route('/new_url', methods=['POST'])
+def new_url():
+    print("new_url")
+    global current_page_number
+    
+    # Try getting JSON first
+    data = request.get_json()
+    if data and 'url' in data:
+        url = data['url']
+    else:
+        # Fall back to form data
+        url = request.form.get('url')
+
+    if not url:
+        print("Invalid request: 'url' key missing or malformed JSON")
+        return jsonify(status='error', message="'url' key missing or invalid JSON"), 400
+
+    print(f'[{time.time()}] Clicked URL: {url}')
+    
+    # Screenshot logic here
+    try:
+        with page_number_lock:
+            screenshot = pyautogui.screenshot()
+            screenshot.save(f'static/data/screenshot_page{current_page_number+1}.png')
+            current_page_number += 1
+        print("Screenshot saved successfully.")
+    except Exception as e:
+        print(f"Error taking screenshot: {e}")
+        return jsonify(status='error', message="Failed to take screenshot"), 500
+    
+    # Log the click to the CSV file
+    with open("data/URL_clicks.csv", "a+") as f:
+        print(f"{time.time()}, {url}", file=f)
+    
+    return jsonify(status='success')
+'''
+
+import time  # Ensure the time module is imported at the top of your script
+
+@app.route('/new_url', methods=['POST'])
+def new_url():
+    print("new_url")
+    global current_page_number
+    
+    # Get JSON payload
+    data = request.get_json()
+    
+    # Validate JSON and 'url' key
+    if not data or 'url' not in data:
+        print("Invalid request: 'url' key missing or malformed JSON")
+        return jsonify(status='error', message="'url' key missing or invalid JSON"), 400
+
+    url = data['url']
+    print(f'[{time.time()}] Clicked URL: {url}')  # Log the URL click
+    
+    # Introduce a 1-second delay before taking the screenshot
+    time.sleep(0.5)
+
+    # Screenshot logic here
+    try:
+        with page_number_lock:
+            screenshot = pyautogui.screenshot()
+            screenshot.save(f'static/data/screenshot_page{current_page_number+1}.png')
+            current_page_number += 1
+        print("Screenshot saved successfully.")
+    except Exception as e:
+        print(f"Error taking screenshot: {e}")
+        return jsonify(status='error', message="Failed to take screenshot"), 500
+    
+    # Log the click to the CSV file
+    with open("data/URL_clicks.csv", "a+") as f:
+        print(f"{time.time()}, {url}", file=f)
     
     return jsonify(status='success')
 
