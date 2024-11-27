@@ -198,7 +198,16 @@ def show_results():
     os.chdir('../..')
     print(image_files)
     return render_template('show_results.html', images=image_files)
-  
+
+
+@app.route('/static/data', methods=['GET'])
+def get_image_list():
+    files = glob('static/data/*.png')
+    # Filter out "page0" or any invalid pages
+    valid_files = [os.path.basename(f) for f in files if "page0" not in f]
+    return jsonify(valid_files)
+
+
 if __name__ == '__main__':
     print('Click here to open the app: http://127.0.0.1:3000')
     app.run(port=3000)

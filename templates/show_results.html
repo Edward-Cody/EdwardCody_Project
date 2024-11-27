@@ -1,33 +1,4 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Screenshot Results</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <div class="container mt-5">
-        <h1 class="text-center">Screenshot Results</h1>
-        <div class="row">
-            {% for image in images %}
-                <div class="col-md-4">
-                    <div class="card-mb-4">
-                        <img src="{{ url_for('static', filename='data/'~image) }}" class="card-img-top" alt="Screenshot">
-                        <div class="card-body">
-                            <p class="card-text">{{ image }}</p>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html> -->
-
+<!-- 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -74,6 +45,111 @@
         <img src="static\data\screenshot_page1.png" alt="website screenshot">
         <img src="static\data\heatmap_page1.png" alt="cursor movement heatmap">
     </div>
+
+</body>
+</html>
+ -->
+
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            margin: 0px;
+        }
+        h1 {
+            margin-top: 20px;
+        }
+        .dropdown-container {
+            margin: 20px;
+        }
+        .image-container {
+            position: relative;
+            width: 50%; /* Set a specific width */
+            height: auto;
+        }
+        .image-container img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%; /* Make images fill the container */
+            height: auto;
+        }
+        .image-container img:first-child {
+            z-index: 1;
+        }
+        .image-container img:last-child {
+            z-index: 2;
+            opacity: 0.5; /* Optional: Make top image slightly transparent */
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Results</h1>
+    
+    <!-- Dropdown for selecting pages -->
+    <div class="dropdown-container">
+        <label for="page-select">Select Page: </label>
+        <select id="page-select"></select>
+    </div>
+
+    <div class="image-container">
+        <img id="screenshot" src="static/data/screenshot_page1.png" alt="website screenshot">
+        <img id="heatmap" src="static/data/heatmap_page1.png" alt="cursor movement heatmap">
+    </div>
+
+    <script>
+        // Function to dynamically populate the dropdown and handle page selection
+        window.onload = function() {
+            // Fetch list of available images from the server
+            fetch('/static/data')
+                .then(response => response.json())
+                .then(imageFiles => {
+                    const dropdown = document.getElementById('page-select');
+                    
+                    // Extract unique page numbers from filenames, excluding "page0"
+                    const pages = [...new Set(
+                        imageFiles
+                            .map(file => parseInt(file.match(/page(\d+)/)?.[1]))
+                            .filter(page => page > 0) // Exclude page 0
+                    )].sort((a, b) => a - b);
+    
+                    // Populate dropdown with page numbers
+                    pages.forEach(page => {
+                        const option = document.createElement('option');
+                        option.value = page;
+                        option.textContent = `Page ${page}`;
+                        dropdown.appendChild(option);
+                    });
+    
+                    // Add change event listener to update images on selection
+                    dropdown.addEventListener('change', event => {
+                        const selectedPage = event.target.value;
+                        const screenshot = document.getElementById('screenshot');
+                        const heatmap = document.getElementById('heatmap');
+    
+                        // Update image sources
+                        screenshot.src = `static/data/screenshot_page${selectedPage}.png`;
+                        heatmap.src = `static/data/heatmap_page${selectedPage}.png`;
+                    });
+    
+                    // Trigger initial selection to display the first page
+                    if (pages.length > 0) {
+                        dropdown.value = pages[0];
+                        dropdown.dispatchEvent(new Event('change'));
+                    }
+                })
+                .catch(error => console.error('Error fetching image files:', error));
+        };
+    </script>    
 
 </body>
 </html>
