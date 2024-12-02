@@ -14,10 +14,6 @@ from tkinter import messagebox
 from screeninfo import get_monitors
 
 
-# Global variable to store the URL
-current_page_number = 0
-page_number_lock = threading.Lock()
-
 # Get screen dimensions
 screen = get_monitors()[0]  # Assumes a single monitor setup; otherwise specify the desired monitor
 screen_width = screen.width
@@ -30,7 +26,6 @@ def start_flask_server():
     global flask_process
     flask_process = subprocess.Popen(["python", "app.py"])
     print("Flask server started.")
-
 
 # Function to send the URL to the Flask app, open it, and log it in CSV
 def start_recording():
@@ -57,11 +52,10 @@ def start_recording():
         messagebox.showerror("Error", "Could not connect to the server. Is the Flask app running?")
     
     try:
-        with page_number_lock:
-            time.sleep(1)  # Wait for the page to load
-            screenshot = pyautogui.screenshot()
-            screenshot_path = f'static/data/screenshot_page{current_page_number + 1}.png'
-            screenshot.save(screenshot_path)
+        time.sleep(1)  # Wait for the page to load
+        screenshot = pyautogui.screenshot()
+        screenshot_path = f'static/data/screenshot_page1.png'
+        screenshot.save(screenshot_path)
         print(f"Screenshot saved to {screenshot_path}.")
     except Exception as e:
         print(f"Error taking screenshot: {e}")
@@ -69,44 +63,77 @@ def start_recording():
     
     except Exception as e:
         messagebox.showerror("Error", f"An error occurred: {e}")
-
 '''
-def start_recording():
-    """Starts the localhost server, logs the entered URL, opens it in a browser, 
-    and takes a screenshot of the first page."""
-    url = url_entry.get().strip()
-
-    if not url:
-        messagebox.showwarning("Invalid Input", "Please enter a valid URL.")
-        return
-
-    # Log the URL to the CSV file
-    current_timestamp = time.time()
-    with open("data/URL_clicks.csv", "a+") as f:
-        f.write(f"{current_timestamp}, {url}, \n")
-
-    # Open the URL in the default web browser
-    webbrowser.open(url)
-
-    # Take a screenshot of the first page
-    try:
-        time.sleep(1)  # Wait for the page to load (adjust if needed)
-        screenshot = pyautogui.screenshot()
-        screenshot_path = f'static/data/screenshot_page1.png'
-        screenshot.save(screenshot_path)
-        messagebox.showinfo("Screenshot Saved", f"Screenshot saved at {screenshot_path}")
-    except Exception as e:
-        messagebox.showerror("Screenshot Error", f"Could not take screenshot: {e}")
-
-    # Start the Flask server
-    threading.Thread(target=start_flask_server, daemon=True).start()
+def final_page_number():
+    # Path to the 'data' folder
+    data_folder = "data"
+    
+    # List all files in the 'data' folder
+    files = os.listdir(data_folder)
+    
+    # Filter for mouseX.csv files
+    mouse_files = [f for f in files if f.startswith("mouse") and f.endswith(".csv")]
+    
+    if not mouse_files:
+        # No mouseX.csv files found, return 1
+        return 1
+    
+    # Extract the numbers from the file names (e.g., mouse1.csv -> 1)
+    page_numbers = []
+    for file in mouse_files:
+        try:
+            # Extract the number between 'mouse' and '.csv'
+            number = int(file[5:-4])
+            page_numbers.append(number)
+        except ValueError:
+            continue  # Skip files that don't match the expected format
+    
+    # If no valid page numbers were found, return 1
+    if not page_numbers:
+        return 1
+    
+    # Find the maximum page number and add 1
+    next_page_number = max(page_numbers)
+    print(f"final page number: {next_page_number}")
+    
+    return next_page_number
 '''
-
 # Function to open the "show_results.html" file
 def stop_recording():
     
+    ''' Identify the last page number '''
+    # Path to the 'data' folder
+    data_folder = "data"
+    
+    # List all files in the 'data' folder
+    files = os.listdir(data_folder)
+    
+    # Filter for mouseX.csv files
+    mouse_files = [f for f in files if f.startswith("mouse") and f.endswith(".csv")]
+    
+    if not mouse_files:
+        # No mouseX.csv files found, return 1
+        return 1
+    
+    # Extract the numbers from the file names (e.g., mouse1.csv -> 1)
+    page_numbers = []
+    for file in mouse_files:
+        try:
+            # Extract the number between 'mouse' and '.csv'
+            number = int(file[5:-4])
+            page_numbers.append(number)
+        except ValueError:
+            continue  # Skip files that don't match the expected format
+    
+    # If no valid page numbers were found, return 1
+    if not page_numbers:
+        return 1
+    
+    # Find the maximum page number and add 1
+    next_page_number = int(max(page_numbers))
+
     # Generate heatmap
-    csv_filepath = f"data/mouse{current_page_number}.csv"
+    csv_filepath = f"data/mouse{next_page_number}.csv"
     if os.path.exists(csv_filepath):
         df = pd.read_csv(csv_filepath)
 
@@ -136,7 +163,7 @@ def stop_recording():
         plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
 
         # Save heatmap
-        heatmap_path = f'static/data/heatmap_page{current_page_number}.png'
+        heatmap_path = f'static/data/heatmap_page{next_page_number}.png'
         plt.savefig(heatmap_path, transparent=True, dpi=100, bbox_inches='tight', pad_inches=0)
         plt.close(fig)
 

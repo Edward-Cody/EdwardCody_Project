@@ -341,6 +341,9 @@ def new_url():
     current_timestamp = time.time()
     print(f'[{current_timestamp}] Clicked URL: {url}')  # Log the URL click
 
+    # Introduce a 0.5-second delay before taking the screenshot
+    time.sleep(0.5)
+
     # Calculate time spent on the previous URL
     time_spent = None
     if previous_timestamp is not None and previous_url is not None:
