@@ -108,223 +108,11 @@ def start():
     else:
         redirect(url_for('index')) # redirect to the index page if no URL is provided
 
-'''
-@app.route('/new_url', methods=['POST'])
-def new_url():
-    print("new_url")
-    global current_page_number
-
-    # Get JSON payload
-    data = request.get_json()
-
-    # Validate JSON and 'url' key
-    if not data or 'url' not in data:
-        print("Invalid request: 'url' key missing or malformed JSON")
-        return jsonify(status='error', message="'url' key missing or invalid JSON"), 400
-
-    url = data['url']
-    print(f'[{time.time()}] Clicked URL: {url}')  # Log the URL click
-
-    # Introduce a 0.5-second delay before taking the screenshot
-    time.sleep(0.5)
-
-    # Screenshot logic
-    try:
-        with page_number_lock:
-            screenshot = pyautogui.screenshot()
-            screenshot_path = f'static/data/screenshot_page{current_page_number + 1}.png'
-            screenshot.save(screenshot_path)
-        print(f"Screenshot saved to {screenshot_path}.")
-    except Exception as e:
-        print(f"Error taking screenshot: {e}")
-        return jsonify(status='error', message="Failed to take screenshot"), 500
-
-    # Generate heatmap
-    csv_filepath = f"data/mouse{current_page_number}.csv"
-    if os.path.exists(csv_filepath):
-        df = pd.read_csv(csv_filepath)
-
-        # Calculate figsize
-        fig_width_inch = screen_width / 100  # Scale down by 100 DPI
-        fig_height_inch = screen_height / 100
-
-        fig, ax = plt.subplots(figsize=(fig_width_inch, fig_height_inch))
-        fig.patch.set_alpha(0)
-        ax.patch.set_alpha(0)
-        ax.invert_yaxis()
-
-        sns.kdeplot(
-            x=df['x'], y=df['y'], cmap='viridis', fill=True, ax=ax,
-            clip=((screen_width, 0), (0, screen_height))
-        )
-        
-        ax.set_xticks([])
-        ax.set_yticks([])
-        ax.set_aspect('equal', adjustable='box')
-
-        # Remove the spines (borders) around the plot
-        for spine in ax.spines.values():
-            spine.set_visible(False)
-
-        # Adjust the layout to remove extra padding
-        plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
-
-        # Save heatmap
-        heatmap_path = f'static/data/heatmap_page{current_page_number}.png'
-        plt.savefig(heatmap_path, transparent=True, dpi=100, bbox_inches='tight', pad_inches=0)
-        plt.close(fig)
-
-        print(f"Heatmap saved to {heatmap_path}.")
-
-    else:
-        print(f"No mouse data found for page {current_page_number}.")
-
-    # Log URL to CSV
-    with open("data/URL_clicks.csv", "a+") as f:
-        print(f"{time.time()}, {url}", file=f)
-
-    # Increment page number
-    with page_number_lock:
-        current_page_number += 1
-
-    return jsonify(status='success')
-'''
-
-'''
-# Global variable to track the previous timestamp
-previous_timestamp = None
-
-@app.route('/new_url', methods=['POST'])
-def new_url():
-    global current_page_number, previous_timestamp
-
-    # Get JSON payload
-    data = request.get_json()
-
-    # Validate JSON and 'url' key
-    if not data or 'url' not in data:
-        print("Invalid request: 'url' key missing or malformed JSON")
-        return jsonify(status='error', message="'url' key missing or invalid JSON"), 400
-
-    url = data['url']
-    current_timestamp = time.time()
-    print(f'[{current_timestamp}] Clicked URL: {url}')  # Log the URL click
-
-    # Calculate time spent on the previous page
-    time_spent = None
-    if previous_timestamp is not None:
-        time_spent = current_timestamp - previous_timestamp
-
-    # Update the previous timestamp to the current one
-    previous_timestamp = current_timestamp
-
-    # Log URL and time spent to CSV
-    with open("data/URL_clicks.csv", "a+") as f:
-        if time_spent is not None:
-            f.write(f"{current_timestamp}, {url}, {time_spent:.2f}\n")
-        else:
-            # For the first URL, time_spent will be None
-            f.write(f"{current_timestamp}, {url}, \n")
-
-    # Screenshot logic
-    try:
-        with page_number_lock:
-            screenshot = pyautogui.screenshot()
-            screenshot_path = f'static/data/screenshot_page{current_page_number + 1}.png'
-            screenshot.save(screenshot_path)
-        print(f"Screenshot saved to {screenshot_path}.")
-    except Exception as e:
-        print(f"Error taking screenshot: {e}")
-        return jsonify(status='error', message="Failed to take screenshot"), 500
-
-    # Generate heatmap
-    csv_filepath = f"data/mouse{current_page_number}.csv"
-    if os.path.exists(csv_filepath):
-        df = pd.read_csv(csv_filepath)
-
-        # Calculate figsize
-        fig_width_inch = screen_width / 100  # Scale down by 100 DPI
-        fig_height_inch = screen_height / 100
-
-        fig, ax = plt.subplots(figsize=(fig_width_inch, fig_height_inch))
-        fig.patch.set_alpha(0)
-        ax.patch.set_alpha(0)
-        ax.invert_yaxis()
-
-        sns.kdeplot(
-            x=df['x'], y=df['y'], cmap='viridis', fill=True, ax=ax,
-            clip=((screen_width, 0), (0, screen_height))
-        )
-        
-        ax.set_xticks([])
-        ax.set_yticks([])
-        ax.set_aspect('equal', adjustable='box')
-
-        # Remove the spines (borders) around the plot
-        for spine in ax.spines.values():
-            spine.set_visible(False)
-
-        # Adjust the layout to remove extra padding
-        plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
-
-        # Save heatmap
-        heatmap_path = f'static/data/heatmap_page{current_page_number}.png'
-        plt.savefig(heatmap_path, transparent=True, dpi=100, bbox_inches='tight', pad_inches=0)
-        plt.close(fig)
-
-        print(f"Heatmap saved to {heatmap_path}.")
-
-    else:
-        print(f"No mouse data found for page {current_page_number}.")
-
-    try:
-        with page_number_lock:
-            screenshot = pyautogui.screenshot()
-            screenshot_path = f'static/data/screenshot_page{current_page_number + 1}.png'
-            screenshot.save(screenshot_path)
-        print(f"Screenshot saved to {screenshot_path}.")
-    except Exception as e:
-        print(f"Error taking screenshot: {e}")
-        return jsonify(status='error', message="Failed to take screenshot"), 500
-
-    csv_filepath = f"data/mouse{current_page_number}.csv"
-    if os.path.exists(csv_filepath):
-        df = pd.read_csv(csv_filepath)
-        fig_width_inch = screen_width / 100  # Scale down by 100 DPI
-        fig_height_inch = screen_height / 100
-        fig, ax = plt.subplots(figsize=(fig_width_inch, fig_height_inch))
-        fig.patch.set_alpha(0)
-        ax.patch.set_alpha(0)
-        ax.invert_yaxis()
-
-        sns.kdeplot(
-            x=df['x'], y=df['y'], cmap='viridis', fill=True, ax=ax,
-            clip=((screen_width, 0), (0, screen_height))
-        )
-        
-        ax.set_xticks([])
-        ax.set_yticks([])
-        ax.set_aspect('equal', adjustable='box')
-        for spine in ax.spines.values():
-            spine.set_visible(False)
-        plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
-        heatmap_path = f'static/data/heatmap_page{current_page_number}.png'
-        plt.savefig(heatmap_path, transparent=True, dpi=100, bbox_inches='tight', pad_inches=0)
-        plt.close(fig)
-        print(f"Heatmap saved to {heatmap_path}.")
-    else:
-        print(f"No mouse data found for page {current_page_number}.")
-
-    with page_number_lock:
-        current_page_number += 1
-
-    return jsonify(status='success')
-'''
-
 # Global variables to track the previous URL and timestamp
 previous_timestamp = None
 previous_url = None
 
+'''
 @app.route('/new_url', methods=['POST'])
 def new_url():
     global current_page_number, previous_timestamp, previous_url
@@ -418,7 +206,74 @@ def new_url():
     else:
         print(f"No mouse data found for page {current_page_number}.")
     
-    '''
+    with page_number_lock:
+        current_page_number += 1
+
+    return jsonify(status='success')
+'''
+
+@app.route('/new_url', methods=['POST'])
+def new_url():
+    global current_page_number, previous_timestamp, previous_url
+
+    # Get JSON payload
+    data = request.get_json()
+
+    # Validate JSON and 'url' key
+    if not data or 'url' not in data:
+        print("Invalid request: 'url' key missing or malformed JSON")
+        return jsonify(status='error', message="'url' key missing or invalid JSON"), 400
+
+    url = data['url']
+    current_timestamp = time.time()
+    print(f'[{current_timestamp}] Clicked URL: {url}')  # Log the URL click
+
+    # Calculate time spent and update the first row if needed
+    csv_filepath = "data/URL_clicks.csv"
+    if previous_timestamp is None and previous_url is None:
+        # Handle the first row case
+        with open(csv_filepath, "r+") as f:
+            rows = f.readlines()
+            if rows:
+                # Update the first row with calculated time_spent
+                first_row = rows[0].strip()
+                timestamp_in_first_row = float(first_row.split(",")[0])  # Extract the timestamp
+                time_spent = current_timestamp - timestamp_in_first_row
+                updated_first_row = f"{first_row} {time_spent:.2f}\n"
+                rows[0] = updated_first_row
+
+                # Rewrite the file with the updated first row
+                f.seek(0)
+                f.writelines(rows)
+                f.truncate()
+
+    elif previous_timestamp is not None and previous_url is not None:
+        # Handle subsequent rows
+        time_spent = current_timestamp - previous_timestamp
+
+        # Update the last logged row
+        with open(csv_filepath, "r+") as f:
+            rows = f.readlines()
+            if rows:
+                last_row = rows[-1].strip()
+                if last_row.endswith(","):  # Check if the last row is incomplete
+                    updated_last_row = f"{last_row} {time_spent:.2f}\n"
+                    rows[-1] = updated_last_row
+
+                # Rewrite the file with the updated rows
+                f.seek(0)
+                f.writelines(rows)
+                f.truncate()
+
+    # Log the new URL with a placeholder for time spent
+    with open(csv_filepath, "a+") as f:
+        f.write(f"{current_timestamp}, {url}, \n")
+
+    # Update globals for the next URL
+    previous_timestamp = current_timestamp
+    previous_url = url
+
+    # Screenshot logic
     try:
         with page_number_lock:
             screenshot = pyautogui.screenshot()
@@ -429,40 +284,56 @@ def new_url():
         print(f"Error taking screenshot: {e}")
         return jsonify(status='error', message="Failed to take screenshot"), 500
 
+    # Generate heatmap
     csv_filepath = f"data/mouse{current_page_number}.csv"
     if os.path.exists(csv_filepath):
         df = pd.read_csv(csv_filepath)
+
+        # Calculate figsize
         fig_width_inch = screen_width / 100  # Scale down by 100 DPI
         fig_height_inch = screen_height / 100
-        fig, ax = plt.subplots(figsize=(fig_width_inch, fig_height_inch))
-        fig.patch.set_alpha(0)
-        ax.patch.set_alpha(0)
-        ax.invert_yaxis()
 
+        fig, ax = plt.subplots(figsize=(fig_width_inch, fig_height_inch))  # Set size to screen resolution
+        fig.patch.set_alpha(0)  # Set size to screen resolution
+        ax.patch.set_alpha(0)  # Set size to screen resolution
+        ax.invert_yaxis()  # Invert y-axis to match the coordinate system of the recorded data
+
+        # Create a KDE plot on the specified axes
         sns.kdeplot(
             x=df['x'], y=df['y'], cmap='viridis', fill=True, ax=ax,
             clip=((screen_width, 0), (0, screen_height))
         )
         
+        # Remove axis labels and ticks
+        ax.set_xlabel('')
+        ax.set_ylabel('')
         ax.set_xticks([])
         ax.set_yticks([])
+
+        # Ensure x and y axes have the same scale
         ax.set_aspect('equal', adjustable='box')
+
+        # Remove the spines (borders) around the plot
         for spine in ax.spines.values():
             spine.set_visible(False)
+
+        # Adjust the layout to remove extra padding
         plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
+
+        # Save heatmap
         heatmap_path = f'static/data/heatmap_page{current_page_number}.png'
         plt.savefig(heatmap_path, transparent=True, dpi=100, bbox_inches='tight', pad_inches=0)
         plt.close(fig)
+
         print(f"Heatmap saved to {heatmap_path}.")
+
     else:
         print(f"No mouse data found for page {current_page_number}.")
-    '''
-    
+
     with page_number_lock:
         current_page_number += 1
 
     return jsonify(status='success')
-
 
 @app.route('/end_session', methods=['POST'])
 def end_session():

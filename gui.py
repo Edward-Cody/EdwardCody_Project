@@ -66,7 +66,44 @@ def start_recording():
 
 # Function to open the "show_results.html" file
 def stop_recording():
+    global previous_timestamp
+
+    # Calculate and record time spent for the last row in URL_clicks.csv
+    csv_filepath = "data/URL_clicks.csv"
+    current_timestamp = time.time()
     
+    if os.path.exists(csv_filepath):
+        with open(csv_filepath, "r+") as f:
+            rows = f.readlines()            
+            
+            if rows:
+                # Get the last row
+                last_row = rows[-1].strip()                
+                
+                if last_row.endswith(","):  # Check if `time_spent` is not already recorded
+                    # Extract the timestamp from the last row
+                    try:
+                        last_timestamp = float(last_row.split(",")[0])                        
+                    except (IndexError, ValueError):
+                        print("Error parsing last row for timestamp.")
+                        return
+                    
+                    # Calculate time spent
+                    time_spent = current_timestamp - last_timestamp                    
+                    updated_last_row = f"{last_row} {time_spent:.2f}\n"                    
+                    rows[-1] = updated_last_row  # Update the last row
+                    
+                    # Rewrite the file with the updated last row
+                    f.seek(0)
+                    f.writelines(rows)
+                    f.truncate()
+                    print(f"Time spent {time_spent:.2f} seconds recorded for the last URL.")
+            else:
+                print("CSV file is empty. No rows to update.")
+    else:
+        print(f"{csv_filepath} does not exist. Cannot record time spent.")
+
+
     ''' Identify the last page number '''
     # Path to the 'data' folder
     data_folder = "data"
@@ -96,10 +133,10 @@ def stop_recording():
         return 1
     
     # Find the maximum page number and add 1
-    next_page_number = int(max(page_numbers))
+    final_page_number = int(max(page_numbers))
 
     # Generate heatmap
-    csv_filepath = f"data/mouse{next_page_number}.csv"
+    csv_filepath = f"data/mouse{final_page_number}.csv"
     if os.path.exists(csv_filepath):
         df = pd.read_csv(csv_filepath)
 
@@ -135,7 +172,7 @@ def stop_recording():
         plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
 
         # Save heatmap
-        heatmap_path = f'static/data/heatmap_page{next_page_number}.png'
+        heatmap_path = f'static/data/heatmap_page{final_page_number}.png'
         plt.savefig(heatmap_path, transparent=True, dpi=100, bbox_inches='tight', pad_inches=0)
         plt.close(fig)
 
