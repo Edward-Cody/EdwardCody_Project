@@ -381,18 +381,24 @@ def new_url():
         fig_width_inch = screen_width / 100  # Scale down by 100 DPI
         fig_height_inch = screen_height / 100
 
-        fig, ax = plt.subplots(figsize=(fig_width_inch, fig_height_inch))
-        fig.patch.set_alpha(0)
-        ax.patch.set_alpha(0)
-        ax.invert_yaxis()
+        fig, ax = plt.subplots(figsize=(fig_width_inch, fig_height_inch))  # Set size to screen resolution
+        fig.patch.set_alpha(0)  # Set size to screen resolution
+        ax.patch.set_alpha(0)  # Set size to screen resolution
+        ax.invert_yaxis()  # Invert y-axis to match the coordinate system of the recorded data
 
+        # Create a KDE plot on the specified axes
         sns.kdeplot(
             x=df['x'], y=df['y'], cmap='viridis', fill=True, ax=ax,
             clip=((screen_width, 0), (0, screen_height))
         )
         
+        # Remove axis labels and ticks
+        ax.set_xlabel('')
+        ax.set_ylabel('')
         ax.set_xticks([])
         ax.set_yticks([])
+
+        # Ensure x and y axes have the same scale
         ax.set_aspect('equal', adjustable='box')
 
         # Remove the spines (borders) around the plot

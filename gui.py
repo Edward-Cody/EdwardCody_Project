@@ -63,41 +63,7 @@ def start_recording():
     
     except Exception as e:
         messagebox.showerror("Error", f"An error occurred: {e}")
-'''
-def final_page_number():
-    # Path to the 'data' folder
-    data_folder = "data"
-    
-    # List all files in the 'data' folder
-    files = os.listdir(data_folder)
-    
-    # Filter for mouseX.csv files
-    mouse_files = [f for f in files if f.startswith("mouse") and f.endswith(".csv")]
-    
-    if not mouse_files:
-        # No mouseX.csv files found, return 1
-        return 1
-    
-    # Extract the numbers from the file names (e.g., mouse1.csv -> 1)
-    page_numbers = []
-    for file in mouse_files:
-        try:
-            # Extract the number between 'mouse' and '.csv'
-            number = int(file[5:-4])
-            page_numbers.append(number)
-        except ValueError:
-            continue  # Skip files that don't match the expected format
-    
-    # If no valid page numbers were found, return 1
-    if not page_numbers:
-        return 1
-    
-    # Find the maximum page number and add 1
-    next_page_number = max(page_numbers)
-    print(f"final page number: {next_page_number}")
-    
-    return next_page_number
-'''
+
 # Function to open the "show_results.html" file
 def stop_recording():
     
@@ -141,18 +107,24 @@ def stop_recording():
         fig_width_inch = screen_width / 100  # Scale down by 100 DPI
         fig_height_inch = screen_height / 100
 
-        fig, ax = plt.subplots(figsize=(fig_width_inch, fig_height_inch))
-        fig.patch.set_alpha(0)
-        ax.patch.set_alpha(0)
-        ax.invert_yaxis()
+        fig, ax = plt.subplots(figsize=(fig_width_inch, fig_height_inch))  # Set size to screen resolution
+        fig.patch.set_alpha(0)  # Set size to screen resolution
+        ax.patch.set_alpha(0)  # Set size to screen resolution
+        ax.invert_yaxis()  # Invert y-axis to match the coordinate system of the recorded data
 
+        # Create a KDE plot on the specified axes
         sns.kdeplot(
             x=df['x'], y=df['y'], cmap='viridis', fill=True, ax=ax,
             clip=((screen_width, 0), (0, screen_height))
         )
         
+        # Remove axis labels and ticks
+        ax.set_xlabel('')
+        ax.set_ylabel('')
         ax.set_xticks([])
         ax.set_yticks([])
+
+        # Ensure x and y axes have the same scale
         ax.set_aspect('equal', adjustable='box')
 
         # Remove the spines (borders) around the plot
