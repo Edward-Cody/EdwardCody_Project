@@ -112,106 +112,6 @@ def start():
 previous_timestamp = None
 previous_url = None
 
-'''
-@app.route('/new_url', methods=['POST'])
-def new_url():
-    global current_page_number, previous_timestamp, previous_url
-
-    # Get JSON payload
-    data = request.get_json()
-
-    # Validate JSON and 'url' key
-    if not data or 'url' not in data:
-        print("Invalid request: 'url' key missing or malformed JSON")
-        return jsonify(status='error', message="'url' key missing or invalid JSON"), 400
-
-    url = data['url']
-    current_timestamp = time.time()
-    print(f'[{current_timestamp}] Clicked URL: {url}')  # Log the URL click
-
-    # Introduce a 0.5-second delay before taking the screenshot
-    time.sleep(0.5)
-
-    # Calculate time spent on the previous URL
-    time_spent = None
-    if previous_timestamp is not None and previous_url is not None:
-        time_spent = current_timestamp - previous_timestamp
-
-        # Log previous URL with time spent to CSV
-        with open("data/URL_clicks.csv", "a+") as f:
-            f.write(f"{previous_timestamp}, {previous_url}, {time_spent:.2f}\n")
-
-    # Update previous URL and timestamp
-    previous_url = url
-    previous_timestamp = current_timestamp
-
-    # Log the current URL with a placeholder for time spent (to be updated later)
-    with open("data/URL_clicks.csv", "a+") as f:
-        f.write(f"{current_timestamp}, {url}, \n")
-
-    # Screenshot logic
-    try:
-        with page_number_lock:
-            screenshot = pyautogui.screenshot()
-            screenshot_path = f'static/data/screenshot_page{current_page_number + 1}.png'
-            screenshot.save(screenshot_path)
-        print(f"Screenshot saved to {screenshot_path}.")
-    except Exception as e:
-        print(f"Error taking screenshot: {e}")
-        return jsonify(status='error', message="Failed to take screenshot"), 500
-
-    # Generate heatmap
-    csv_filepath = f"data/mouse{current_page_number}.csv"
-    if os.path.exists(csv_filepath):
-        df = pd.read_csv(csv_filepath)
-
-        # Calculate figsize
-        fig_width_inch = screen_width / 100  # Scale down by 100 DPI
-        fig_height_inch = screen_height / 100
-
-        fig, ax = plt.subplots(figsize=(fig_width_inch, fig_height_inch))  # Set size to screen resolution
-        fig.patch.set_alpha(0)  # Set size to screen resolution
-        ax.patch.set_alpha(0)  # Set size to screen resolution
-        ax.invert_yaxis()  # Invert y-axis to match the coordinate system of the recorded data
-
-        # Create a KDE plot on the specified axes
-        sns.kdeplot(
-            x=df['x'], y=df['y'], cmap='viridis', fill=True, ax=ax,
-            clip=((screen_width, 0), (0, screen_height))
-        )
-        
-        # Remove axis labels and ticks
-        ax.set_xlabel('')
-        ax.set_ylabel('')
-        ax.set_xticks([])
-        ax.set_yticks([])
-
-        # Ensure x and y axes have the same scale
-        ax.set_aspect('equal', adjustable='box')
-
-        # Remove the spines (borders) around the plot
-        for spine in ax.spines.values():
-            spine.set_visible(False)
-
-        # Adjust the layout to remove extra padding
-        plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
-
-        # Save heatmap
-        heatmap_path = f'static/data/heatmap_page{current_page_number}.png'
-        plt.savefig(heatmap_path, transparent=True, dpi=100, bbox_inches='tight', pad_inches=0)
-        plt.close(fig)
-
-        print(f"Heatmap saved to {heatmap_path}.")
-
-    else:
-        print(f"No mouse data found for page {current_page_number}.")
-    
-    with page_number_lock:
-        current_page_number += 1
-
-    return jsonify(status='success')
-'''
-
 @app.route('/new_url', methods=['POST'])
 def new_url():
     global current_page_number, previous_timestamp, previous_url
@@ -376,6 +276,19 @@ def get_image_list():
     # Filter out "page0" or any invalid pages
     valid_files = [os.path.basename(f) for f in files if "page0" not in f]
     return jsonify(valid_files)
+
+
+@app.route('/get_click_data', methods=['GET'])
+def get_click_data():
+    csv_filepath = "data/URL_clicks.csv"
+    try:
+        # Read CSV and extract URL and time_spent
+        df = pd.read_csv(csv_filepath, header=None, names=["timestamp", "url", "time_spent"])
+        df = df.dropna()  # Drop rows with missing time_spent
+        data = df[["url", "time_spent"]].to_dict(orient="records")
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({"error": str(e)})
 
 
 if __name__ == '__main__':

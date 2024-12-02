@@ -1,3 +1,4 @@
+<!--
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -38,6 +39,126 @@
             opacity: 0.5; /* Optional: Make top image slightly transparent */
         }
     </style>
+</head>
+<body>
+
+    <h1>Results</h1>
+    -->
+    <!-- Dropdown for selecting pages 
+    <div class="dropdown-container">
+        <label for="page-select">Select Page: </label>
+        <select id="page-select"></select>
+    </div>
+
+    <div class="image-container">
+        <img id="screenshot" src="static/data/screenshot_page1.png" alt="website screenshot">
+        <img id="heatmap" src="static/data/heatmap_page1.png" alt="cursor movement heatmap">
+    </div>
+
+    <script>
+        // Function to dynamically populate the dropdown and handle page selection
+        window.onload = function() {
+            // Fetch list of available images from the server
+            fetch('/static/data')
+                .then(response => response.json())
+                .then(imageFiles => {
+                    const dropdown = document.getElementById('page-select');
+                    
+                    // Extract unique page numbers from filenames, excluding "page0"
+                    const pages = [...new Set(
+                        imageFiles
+                            .map(file => parseInt(file.match(/page(\d+)/)?.[1]))
+                            .filter(page => page > 0) // Exclude page 0
+                    )].sort((a, b) => a - b);
+    
+                    // Populate dropdown with page numbers
+                    pages.forEach(page => {
+                        const option = document.createElement('option');
+                        option.value = page;
+                        option.textContent = `Page ${page}`;
+                        dropdown.appendChild(option);
+                    });
+    
+                    // Add change event listener to update images on selection
+                    dropdown.addEventListener('change', event => {
+                        const selectedPage = event.target.value;
+                        const screenshot = document.getElementById('screenshot');
+                        const heatmap = document.getElementById('heatmap');
+    
+                        // Update image sources
+                        screenshot.src = `static/data/screenshot_page${selectedPage}.png`;
+                        heatmap.src = `static/data/heatmap_page${selectedPage}.png`;
+                    });
+    
+                    // Trigger initial selection to display the first page
+                    if (pages.length > 0) {
+                        dropdown.value = pages[0];
+                        dropdown.dispatchEvent(new Event('change'));
+                    }
+                })
+                .catch(error => console.error('Error fetching image files:', error));
+        };
+    </script>    
+
+</body>
+</html>
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            margin: 0px;
+        }
+        h1 {
+            margin-top: 20px;
+        }
+        h2 {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .dropdown-container {
+            margin: 20px;
+        }
+        .image-container {
+            position: relative;
+            width: 50%;
+            height: auto;
+        }
+        .image-container img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%; /* Make images fill the container */
+            height: auto;
+        }
+        .image-container img:first-child {
+            z-index: 1;
+        }
+        .image-container img:last-child {
+            z-index: 2;
+            opacity: 0.5; /* Optional: Make top image slightly transparent */
+        }
+        .bar-chart {
+            width: 40%;
+            height: auto;
+            margin-top: 30%;
+            padding-left: 30%;
+            padding-right: 30%;
+            padding-bottom: 5%;
+            background-color: #DDDDDD;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -97,7 +218,92 @@
                 })
                 .catch(error => console.error('Error fetching image files:', error));
         };
-    </script>    
+    </script>
+    
+    <!-- Bar Chart Section -->
+    <div class="bar-chart">
+        <h2>Time Spent on Pages</h2>
+        <canvas id="timeSpentChart" width=50% height=50%></canvas>
+
+        <script>
+            // Existing dropdown script
+            // window.onload = function () {
+            //     fetch('/static/data')
+            //         .then(response => response.json())
+            //         .then(imageFiles => {
+            //             const dropdown = document.getElementById('page-select');
+            //             const pages = [...new Set(
+            //                 imageFiles.map(file => parseInt(file.match(/page(\d+)/)?.[1])).filter(page => page > 0)
+            //             )].sort((a, b) => a - b);
+            //             pages.forEach(page => {
+            //                 const option = document.createElement('option');
+            //                 option.value = page;
+            //                 option.textContent = `Page ${page}`;
+            //                 dropdown.appendChild(option);
+            //             });
+            //             if (pages.length > 0) {
+            //                 dropdown.value = pages[0];
+            //                 dropdown.dispatchEvent(new Event('change'));
+            //             }
+            //         })
+            //         .catch(error => console.error('Error fetching image files:', error));
+            // };
+
+            // Bar Chart Script
+            fetch('/get_click_data')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error("Error fetching click data:", data.error);
+                        return;
+                    }
+                    const urls = data.map(item => item.url);
+                    const timeSpent = data.map(item => parseFloat(item.time_spent));
+                    const ctx = document.getElementById('timeSpentChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: urls,
+                            // labels: ["Page 1", "Page 2", "Page 3","Page 4"],
+                            datasets: [{
+                                label: 'Time Spent (seconds)',
+                                data: timeSpent,
+                                // data: [5.37, 6.05, 18.30, 9.00],
+                                backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                x: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        autoSkip: false,
+                                        maxRotation: 45,
+                                        minRotation: 45
+                                    }
+                                },
+                                y: {
+                                    beginAtZero: true
+                                }
+                            },
+                            plugins: {
+                                tooltip: {
+                                    callbacks: {
+                                        label: function (tooltipItem) {
+                                            return `${tooltipItem.label}: ${tooltipItem.raw.toFixed(2)} seconds`;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                })
+                .catch(error => console.error('Error fetching click data:', error));
+        </script>
+    </div>
 
 </body>
 </html>
