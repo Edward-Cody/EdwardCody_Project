@@ -221,7 +221,7 @@ root.title("Cursor Tracker")
 # Set font styles
 header_font = font.Font(family="Arial", size=16, weight="bold")
 label_font = font.Font(family="Arial", size=12)
-button_font = font.Font(family="Arial", size=12)
+button_font = font.Font(family="Arial", size=12, weight="bold")
 
 # Header
 tk.Label(root, text="Cursor Tracker", font=header_font).pack(pady=20)
@@ -238,13 +238,13 @@ button_frame.pack(pady=25)
 
 # Start Button (Green)
 start_button = tk.Button(
-    button_frame, text="Start", command=start_recording, bg="green", fg="white", font=button_font
+    button_frame, text="          Start          ", command=start_recording, bg="green", fg="white", font=button_font
 )
 start_button.pack(side="left", padx=25)
 
 # Stop Button (Red)
 stop_button = tk.Button(
-    button_frame, text="Stop", command=stop_recording, bg="red", fg="white", font=button_font
+    button_frame, text="          Stop          ", command=stop_recording, bg="red", fg="white", font=button_font
 )
 stop_button.pack(side="left", padx=25)
 
