@@ -4,13 +4,14 @@ import tkinter as tk
 import requests
 import threading
 import os
+import threading
 import time
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pyautogui # pip install pyautogui
 from flask import jsonify
-from tkinter import messagebox
+from tkinter import font, messagebox
 from screeninfo import get_monitors
 
 
@@ -198,20 +199,54 @@ def on_closing():
         print("Flask server stopped.")
     root.destroy()
 
+# Function to center the window
+def center_window(window):
+    window.update_idletasks()  # Ensure the window dimensions are updated
+    screen_width = window.winfo_screenwidth()
+    screen_height = window.winfo_screenheight()
+    window_width = window.winfo_width()
+    window_height = window.winfo_height()
+
+    # Calculate position
+    x = (screen_width // 2) - (window_width // 2)
+    y = (screen_height // 2) - (window_height // 2)
+
+    # Set the window position
+    window.geometry(f"{window_width}x{window_height}+{x}+{y}")
+
 # Initialize the GUI
 root = tk.Tk()
-root.title("Localhost GUI")
+root.title("Cursor Tracker")
 
-# GUI Layout
-tk.Label(root, text="Enter URL:").pack(pady=5)
-url_entry = tk.Entry(root, width=40)
+# Set font styles
+header_font = font.Font(family="Arial", size=16, weight="bold")
+label_font = font.Font(family="Arial", size=12)
+button_font = font.Font(family="Arial", size=12)
+
+# Header
+tk.Label(root, text="Cursor Tracker", font=header_font).pack(pady=20)
+
+# URL Entry Field
+tk.Label(root, text="Enter URL:", font=label_font).pack(pady=5)
+url_entry = tk.Entry(root, width=40, font=('Arial 12'))
 url_entry.pack(pady=5)
+url_entry.pack(padx=20)
 
-start_button = tk.Button(root, text="Start", command=start_recording)
-start_button.pack(pady=10)
+# Button Frame (to align buttons in a single row)
+button_frame = tk.Frame(root)
+button_frame.pack(pady=25)
 
-stop_button = tk.Button(root, text="Stop", command=stop_recording)
-stop_button.pack(pady=10)
+# Start Button (Green)
+start_button = tk.Button(
+    button_frame, text="Start", command=start_recording, bg="green", fg="white", font=button_font
+)
+start_button.pack(side="left", padx=25)
+
+# Stop Button (Red)
+stop_button = tk.Button(
+    button_frame, text="Stop", command=stop_recording, bg="red", fg="white", font=button_font
+)
+stop_button.pack(side="left", padx=25)
 
 # Start the Flask server in a separate thread
 server_thread = threading.Thread(target=start_flask_server, daemon=True)
@@ -219,6 +254,10 @@ server_thread.start()
 
 # Handle GUI close event
 root.protocol("WM_DELETE_WINDOW", on_closing)
+
+# Center the window after it is created
+root.update_idletasks()  # Ensure all widgets are rendered
+center_window(root)
 
 # Run the GUI
 root.mainloop()
