@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
-    "name": "only URL click, start stop",
-    "version": "4.0",
+    "name": "Cursor Tracker",
+    "version": "5.0",
     "permissions": [
         "activeTab",
         "http://localhost:3000/",

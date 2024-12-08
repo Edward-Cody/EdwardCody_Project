@@ -1,1 +1,1 @@
-This is a browser plug-in that tracks the movements of the cursor, and the clicks made. The URL, size of the browser, and time stamps are also recorded. Using this data, the user can generate heat maps of their cursor movements of click positions.
+This is a browser plug-in that tracks the movements of the cursor. The web pages visited, time spent on each web page, size of the monitor, and time stamps are also recorded. Using this data, a heat map is generated for each visited web page, showing their cursor movements.

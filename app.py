@@ -53,11 +53,12 @@ screen_height = screen.height
 screen_width_str = str(screen_width)
 screen_height_str = str(screen_height)
 
-#CSV setup for user's monitor size
+# CSV setup for user's monitor size
 header = "x,y"
 UL = "0,0"
 LR = screen_width_str+","+screen_height_str
 
+# Record mouse coordinates in CSV
 def track_mouse():
     global current_page_number
     try:
@@ -69,9 +70,9 @@ def track_mouse():
             # Check if file is empty and write header if it is
             if not os.path.exists(filename) or os.path.getsize(filename) == 0:
                 with open(filename, "w") as f:
-                    print(header, file=f)  #required for heatmap processing
-                    print(UL, file=f)  #needed so that screenshot matches screensize, making heatmap accurate
-                    print(LR, file=f)  #needed so that screenshot matches screensize, making heatmap accurate
+                    print(header, file=f)  # required for heatmap processing
+                    print(UL, file=f)  # needed so that screenshot matches screensize, making heatmap accurate
+                    print(LR, file=f)  # needed so that screenshot matches screensize, making heatmap accurate
             
             # Append the coordinates to the file
             with open(filename, "a+") as f:
@@ -86,10 +87,10 @@ mouse_thread.daemon = True  # This ensures the thread will exit when the main pr
 
 @app.route('/')
 def index():
-    if len(glob("static/data/*")) > 0: # if there are any image files in the static folder
+    if len(glob("static/data/*")) > 0:  # if there are any image files in the static folder
         return redirect(url_for('show_results'))
     else:
-        return render_template('index.html') # show the index page if there are no image files
+        return render_template('error')  # show the index page if there are no image files
     
     
 @app.route('/start', methods=['GET'])
@@ -104,9 +105,7 @@ def start():
         # start thread if not already started
         if not mouse_thread.is_alive():
                 mouse_thread.start()
-        return redirect(url) # show that URL in the browser
-    else:
-        redirect(url_for('index')) # redirect to the index page if no URL is provided
+        return redirect(url)  # show that URL in the browser
 
 # Global variables to track the previous URL and timestamp
 previous_timestamp = None
@@ -128,7 +127,7 @@ def new_url():
     current_timestamp = time.time()
     print(f'[{current_timestamp}] Clicked URL: {url}')  # Log the URL click
 
-    # Calculate time spent and update the first row if needed
+    # Calculate time spent and update the first row
     csv_filepath = "data/URL_clicks.csv"
     if previous_timestamp is None and previous_url is None:
         # Handle the first row case
@@ -184,7 +183,7 @@ def new_url():
         print(f"Error taking screenshot: {e}")
         return jsonify(status='error', message="Failed to take screenshot"), 500
 
-    # Generate heatmap
+    # Heatmap generate logic
     csv_filepath = f"data/mouse{current_page_number}.csv"
     if os.path.exists(csv_filepath):
         df = pd.read_csv(csv_filepath)
@@ -194,8 +193,8 @@ def new_url():
         fig_height_inch = screen_height / 100
 
         fig, ax = plt.subplots(figsize=(fig_width_inch, fig_height_inch))  # Set size to screen resolution
-        fig.patch.set_alpha(0)  # Set size to screen resolution
-        ax.patch.set_alpha(0)  # Set size to screen resolution
+        fig.patch.set_alpha(0)  # Make transparent
+        ax.patch.set_alpha(0)  # Make transparent
         ax.invert_yaxis()  # Invert y-axis to match the coordinate system of the recorded data
 
         # Create a KDE plot on the specified axes
@@ -259,10 +258,8 @@ def end_session():
 @app.route('/show_results', methods=['GET'])
 def show_results():
 
-    # for each mouse coords other than 1 create a heatmap and composite it over the screenshot
-    # save the results in the static folder as jpgs and change the code below to use jpgs
-    # instead of pngs - done (11/1/24)
-
+    # for each mouse coords create a heatmap and composite it over the screenshot
+    # save the results in the static folder as pngs
     os.chdir('static/data')
     image_files = glob('*.png')
     os.chdir('../..')

@@ -46,7 +46,6 @@ def start_recording():
         response = requests.get(f"http://127.0.0.1:3000/start", params={"url": url})
         if response.ok:
             webbrowser.open(url)  # Open the URL in the default browser
-            # messagebox.showinfo("Success", "Recording started, URL opened, and logged in CSV!")
         else:
             messagebox.showerror("Error", f"Failed to start recording. Server response: {response.status_code}")
     except requests.exceptions.ConnectionError:
@@ -78,10 +77,10 @@ def stop_recording():
             rows = f.readlines()            
             
             if rows:
-                # Get the last row
-                last_row = rows[-1].strip()                
+                last_row = rows[-1].strip()  # Get the last row       
                 
                 if last_row.endswith(","):  # Check if `time_spent` is not already recorded
+                    
                     # Extract the timestamp from the last row
                     try:
                         last_timestamp = float(last_row.split(",")[0])                        
@@ -115,8 +114,8 @@ def stop_recording():
     # Filter for mouseX.csv files
     mouse_files = [f for f in files if f.startswith("mouse") and f.endswith(".csv")]
     
-    if not mouse_files:
-        # No mouseX.csv files found, return 1
+    # No mouseX.csv files found, return 1
+    if not mouse_files:  
         return 1
     
     # Extract the numbers from the file names (e.g., mouse1.csv -> 1)
@@ -146,8 +145,8 @@ def stop_recording():
         fig_height_inch = screen_height / 100
 
         fig, ax = plt.subplots(figsize=(fig_width_inch, fig_height_inch))  # Set size to screen resolution
-        fig.patch.set_alpha(0)  # Set size to screen resolution
-        ax.patch.set_alpha(0)  # Set size to screen resolution
+        fig.patch.set_alpha(0)  # Make transparent
+        ax.patch.set_alpha(0)  # Make transparent
         ax.invert_yaxis()  # Invert y-axis to match the coordinate system of the recorded data
 
         # Create a KDE plot on the specified axes
@@ -186,7 +185,6 @@ def stop_recording():
         results_path = os.path.abspath("templates/show_results.html")  # Path to the HTML file
         if os.path.exists(results_path):
             webbrowser.open(f"http://127.0.0.1:3000/show_results")  # Open the Flask-hosted results
-            # messagebox.showinfo("Results", "Results page opened in the browser!")
         else:
             messagebox.showerror("Error", "Results file not found!")
     except Exception as e:
@@ -219,15 +217,23 @@ root = tk.Tk()
 root.title("Cursor Tracker")
 
 # Set font styles
-header_font = font.Font(family="Arial", size=16, weight="bold")
-label_font = font.Font(family="Arial", size=12)
+header_font = font.Font(family="Arial", size=16, weight="bold", slant="italic")
+label_font = font.Font(family="Arial", size=12, weight="bold")
 button_font = font.Font(family="Arial", size=12, weight="bold")
 
 # Header
-tk.Label(root, text="Cursor Tracker", font=header_font).pack(pady=20)
+header = tk.Label(
+    root, 
+    text="Cursor Tracker", 
+    font=header_font, 
+    bg="#471164", 
+    fg="white"
+)
+header.pack(fill="x", ipady=10)  # 'fill="x"' makes the background span the width of the GUI
 
 # URL Entry Field
-tk.Label(root, text="Enter URL:", font=label_font).pack(pady=5)
+tk.Label(root, text="", font=label_font).pack(pady=0)  # to add space below header
+tk.Label(root, text="Enter URL:", font=label_font).pack(pady=10)
 url_entry = tk.Entry(root, width=40, font=('Arial 12'))
 url_entry.pack(pady=5)
 url_entry.pack(padx=20)
