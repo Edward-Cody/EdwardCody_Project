@@ -1,3 +1,5 @@
+"""Summary: This file handles the majority of the processing while runme.py mostly handles the GUI. Details: This file creates the necessary folders, removes old files, gathers screen dimensions, records mouse coordinates, records the URLs and time stamps of the webpages visited, calculates the time spent on each web pages, takes a screenshot and generates a heatmap of each web page visited, and runs the local server."""
+
 import logging
 import matplotlib.pyplot as plt
 import os

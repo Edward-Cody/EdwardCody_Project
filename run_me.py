@@ -1,3 +1,5 @@
+"""Summary: This file mostly handles the GUI while app.py handles the majority of the processing. Details: This file creates the GUI, starts and stops the Flask server, records the first URL, takes the first web page screenshot, records the time spent on the last web page, and opens results.html in the browser."""
+
 import matplotlib.pyplot as plt
 import os
 import pandas as pd
