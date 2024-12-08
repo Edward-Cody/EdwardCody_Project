@@ -100,7 +100,7 @@ def start():
     # Get the value of the URL from the query parameter
     url = request.args.get('url')
     if url:
-        print(f'[{time.time()}] Received URL: {url} (no screenshot can be taken for this page)')
+        print(f'[{time.time()}] Starting URL: {url}')  # Log the URL click
     
         # start thread if not already started
         if not mouse_thread.is_alive():

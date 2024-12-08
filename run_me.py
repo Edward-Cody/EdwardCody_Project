@@ -1,15 +1,15 @@
-import subprocess
-import webbrowser
-import tkinter as tk
-import requests
-import threading
+import matplotlib.pyplot as plt
 import os
+import pandas as pd
+import pyautogui
+import requests
+import seaborn as sns
+import subprocess
 import threading
 import time
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-import pyautogui # pip install pyautogui
+import tkinter as tk
+import webbrowser
+
 from flask import jsonify
 from tkinter import font, messagebox
 from screeninfo import get_monitors

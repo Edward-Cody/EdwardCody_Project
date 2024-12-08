@@ -1,4 +1,3 @@
-
 document.addEventListener('click', function(event) {
     const x = event.clientX;
     const y = event.clientY;
@@ -18,9 +17,7 @@ document.addEventListener('click', function(event) {
         })
         .then(response => response.json())
         .then(data => {
-            //console.log('Response from server:', data);
             console.log(`Clicked at x: ${x}, y: ${y} on ${event.target.tagName}`);
-
         })
         .catch(error => {
             console.error('Error:', error);
