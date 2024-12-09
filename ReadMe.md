@@ -47,7 +47,7 @@ How to run Cursor Tracker
 
 ## Limitations
 - Cursor Tracker cannot accurately display the cursor position if the user scrolls on a web page. If the user scrolls, the cursor position and screenshot are still recorded, but the heatmap will not be an accurate representation.
-- Cursor Tracker is made for Google Chrome, and is not expected, nor has it been tested, to work on other browsers.cd
+- Cursor Tracker is made for Google Chrome, and is not expected, nor has it been tested, to work in other browsers.
 - While it is possible to see the result of the previous run after closing Cursor Tracker, it cannot be accomplished solely through the GUI. The user has to change "1" to "0" in line 42 of "app.py", run "run_me.py", and then press the "Stop" button. It works, but it is not intuitive.
 
 
