@@ -226,8 +226,9 @@ def new_url():
     #
     try:
         with page_number_lock:
+            time.sleep(0.5)  # Waits 0.5 seconds before taking screenshot. If screenshots are captured before the new webpage loads, increase "0.5" as needed 
             screenshot = pyautogui.screenshot()
-            screenshot_path = f'static/data/screenshot_page{current_page_number + 1}.png'
+            screenshot_path = f'static/data/screenshot_page{current_page_number + 1}.png'  # Screenshot of new webpage is taken before the current_page_number increases, hence the "+ 1"
             screenshot.save(screenshot_path)
         print(f"Screenshot saved to {screenshot_path}.")
     except Exception as e:

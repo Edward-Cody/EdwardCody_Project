@@ -43,7 +43,7 @@ def start_flask_server():
     print("Flask server started.")
 
 # 
-# Function to send the URL to the Flask app, open it, and log it in CSV
+# Function to send the URL to the Flask app, open it, and log it in CSV, takes initial screenshot
 #
 def start_recording():
     """
@@ -83,8 +83,11 @@ def start_recording():
     except requests.exceptions.ConnectionError:
         messagebox.showerror("Error", "Could not connect to the server. Is the Flask app running?")
     
+    #
+    # First screenshot logic
+    #
     try:
-        time.sleep(1)  # Wait for the page to load
+        time.sleep(1)  # Wait 1 second for the first webpage to load, adjust if needed
         screenshot = pyautogui.screenshot()
         screenshot_path = f'static/data/screenshot_page1.png'
         screenshot.save(screenshot_path)
@@ -186,7 +189,7 @@ def stop_recording():
     final_page_number = int(max(page_numbers))
 
     # 
-    # Generate heatmap
+    # Generate final heatmap
     #
     csv_filepath = f"data/mouse{final_page_number}.csv"
     if os.path.exists(csv_filepath):
@@ -231,7 +234,7 @@ def stop_recording():
         print(f"Heatmap saved to {heatmap_path}.")
 
     else:
-        print(f"FINAL HEATMAP FAILED TO GENERATE")
+        print(f"Final heatmap failed to generate")
     
     try:
         results_path = os.path.abspath("templates/show_results.html")  # Path to the HTML file
