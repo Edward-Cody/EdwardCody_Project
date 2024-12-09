@@ -23,7 +23,9 @@ from pynput import mouse # pip install pynput
 from screeninfo import get_monitors
 from tkinter import messagebox
 
-
+#
+# Set up (Flask, create folders, remove files, run type, screen dimensions, CSV header)
+#
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})  # Allow requests from any origin
 
@@ -60,7 +62,9 @@ header = "x,y"
 UL = "0,0"
 LR = screen_width_str+","+screen_height_str
 
+# 
 # Record mouse coordinates in CSV
+#
 def track_mouse():
     global current_page_number
     try:
@@ -86,7 +90,9 @@ def track_mouse():
 mouse_thread = threading.Thread(target=track_mouse)
 mouse_thread.daemon = True  # This ensures the thread will exit when the main program exits
 
-
+# 
+# Navigate to show_results.html
+#
 @app.route('/')
 def index():
     if len(glob("static/data/*")) > 0:  # if there are any image files in the static folder
@@ -94,7 +100,9 @@ def index():
     else:
         return render_template('error')  # show the index page if there are no image files
     
-    
+#
+# Begin tracking of cursor coordinates and URL changes
+#
 @app.route('/start', methods=['GET'])
 def start():
     global mouse_thread
@@ -113,6 +121,9 @@ def start():
 previous_timestamp = None
 previous_url = None
 
+#
+# Record URL, timestamp, time spent to URL_clicks.csv, take screenshot of current web page, generate heatmap of previous webpage
+#
 @app.route('/new_url', methods=['POST'])
 def new_url():
     global current_page_number, previous_timestamp, previous_url
@@ -174,7 +185,9 @@ def new_url():
     previous_timestamp = current_timestamp
     previous_url = url
 
+    # 
     # Screenshot logic
+    #
     try:
         with page_number_lock:
             screenshot = pyautogui.screenshot()
@@ -185,7 +198,9 @@ def new_url():
         print(f"Error taking screenshot: {e}")
         return jsonify(status='error', message="Failed to take screenshot"), 500
 
+    # 
     # Heatmap generate logic
+    #
     csv_filepath = f"data/mouse{current_page_number}.csv"
     if os.path.exists(csv_filepath):
         df = pd.read_csv(csv_filepath)
@@ -236,9 +251,11 @@ def new_url():
 
     return jsonify(status='success')
 
+#
+# Handles session end to log the time spent on the last page
+#
 @app.route('/end_session', methods=['POST'])
 def end_session():
-    """Handles session end to log the time spent on the last page."""
     global previous_timestamp, previous_url
 
     if previous_timestamp is not None and previous_url is not None:
@@ -256,19 +273,20 @@ def end_session():
 
     return jsonify(status='success', message='Session ended and time logged.')
 
-
+#
+# List images generated
+#
 @app.route('/show_results', methods=['GET'])
 def show_results():
-
-    # for each mouse coords create a heatmap and composite it over the screenshot
-    # save the results in the static folder as pngs
     os.chdir('static/data')
     image_files = glob('*.png')
     os.chdir('../..')
     print(image_files)
     return render_template('show_results.html', images=image_files)
 
-
+#
+# Get image list
+#
 @app.route('/static/data', methods=['GET'])
 def get_image_list():
     files = glob('static/data/*.png')
@@ -276,7 +294,9 @@ def get_image_list():
     valid_files = [os.path.basename(f) for f in files if "page0" not in f]
     return jsonify(valid_files)
 
-
+#
+# Get click data from URL_clicks.csv
+#
 @app.route('/get_click_data', methods=['GET'])
 def get_click_data():
     csv_filepath = "data/URL_clicks.csv"
@@ -289,7 +309,9 @@ def get_click_data():
     except Exception as e:
         return jsonify({"error": str(e)})
 
-
+#
+# Launch the Flask development server
+#
 if __name__ == '__main__':
     print('Click here to open the app: http://127.0.0.1:3000')
     app.run(port=3000)

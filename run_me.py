@@ -16,21 +16,26 @@ from flask import jsonify
 from tkinter import font, messagebox
 from screeninfo import get_monitors
 
-
+#
 # Get screen dimensions
+#
 screen = get_monitors()[0]  # Assumes a single monitor setup; otherwise specify the desired monitor
 screen_width = screen.width
 screen_height = screen.height
 screen_width_str = str(screen_width)
 screen_height_str = str(screen_height)
 
+# 
 # Function to start the Flask server in a separate thread
+#
 def start_flask_server():
     global flask_process
     flask_process = subprocess.Popen(["python", "app.py"])
     print("Flask server started.")
 
+# 
 # Function to send the URL to the Flask app, open it, and log it in CSV
+#
 def start_recording():
     url = url_entry.get()
     if not url:
@@ -66,7 +71,9 @@ def start_recording():
     except Exception as e:
         messagebox.showerror("Error", f"An error occurred: {e}")
 
-# Function to open the "show_results.html" file
+# 
+# Function to open the "show_results.html" file, adds timestamp to the last row in URL_clicks.csv, and generates the final heatmap
+#
 def stop_recording():
     global previous_timestamp
 
@@ -105,8 +112,10 @@ def stop_recording():
     else:
         print(f"{csv_filepath} does not exist. Cannot record time spent.")
 
-
-    ''' Identify the last page number '''
+    #
+    #  Identify the last page number
+    #
+    
     # Path to the 'data' folder
     data_folder = "data"
     
@@ -137,7 +146,9 @@ def stop_recording():
     # Find the maximum page number and add 1
     final_page_number = int(max(page_numbers))
 
+    # 
     # Generate heatmap
+    #
     csv_filepath = f"data/mouse{final_page_number}.csv"
     if os.path.exists(csv_filepath):
         df = pd.read_csv(csv_filepath)
@@ -192,14 +203,18 @@ def stop_recording():
     except Exception as e:
         messagebox.showerror("Error", f"Could not open results. Error: {e}")
 
+# 
 # Function to stop the Flask server when the GUI is closed
+#
 def on_closing():
     if flask_process:
         flask_process.terminate()
         print("Flask server stopped.")
     root.destroy()
 
+# 
 # Function to center the window
+#
 def center_window(window):
     window.update_idletasks()  # Ensure the window dimensions are updated
     screen_width = window.winfo_screenwidth()
@@ -213,6 +228,10 @@ def center_window(window):
 
     # Set the window position
     window.geometry(f"{window_width}x{window_height}+{x}+{y}")
+
+#
+# Create Cursor Tracker GUI
+#
 
 # Initialize the GUI
 root = tk.Tk()
