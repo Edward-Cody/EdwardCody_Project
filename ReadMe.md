@@ -4,9 +4,10 @@ Cursor Tracker is a way for developers to analyze how users navigate through a w
 
 ## Installation 
 - You need non-standard packages to run my app.py and run_me.py
-  - Use pip to install the required third-party packages:  `pip -r requirements.txt`
+  - Open an OS terminal (e.g. cmd.exe or PowerShell)
+  - Use pip to install the required third-party packages:  `pip --upgrade -r requirements.txt`
 - Google Chrome needs to be set as your default browser
-- Before the user can run Cursor Tracker, the Cursor Tracker browser extension needs to be installed to Google Chrome.
+- Before the user can run Cursor Tracker, the Cursor Tracker browser extension needs to be installed in Google Chrome.
   - Click the extension button in the Google Chrome toolbar:
     - ![Screenshot 2024-12-08 145053](https://github.com/user-attachments/assets/e2bfa084-00db-46e8-8270-ba7c7dee4276)
   - Click "Manage extensions"
@@ -20,8 +21,9 @@ Cursor Tracker is a way for developers to analyze how users navigate through a w
 
 ## Usage
 How to run Cursor Tracker
-- Open "run_me.py" in a code editor such as Visual Studio Code, then run "run_me.py"
-  - ![image](https://github.com/user-attachments/assets/f847c115-754f-4c86-84ee-0a44ea4bbbf8)
+- Open an OS terminal (e.g. cmd.exe or PowerShell)
+- Use "cd" to jump to the project root folder (e.g. `cd /Users/YourName/Desktop/EdwardCody_CursorTrackerTool`)
+- Run "run_me.py": `python run_me.py`
 - A GUI will appear in the center of the screen
 - Type in the URL of the web page where you would like to start
   - ![image](https://github.com/user-attachments/assets/f91b66e0-0617-442b-9f05-894f19fe237d)
@@ -45,6 +47,7 @@ How to run Cursor Tracker
 
 ## Limitations
 - Cursor Tracker cannot accurately display the cursor position if the user scrolls on a web page. If the user scrolls, the cursor position and screenshot are still recorded, but the heatmap will not be an accurate representation.
+- Cursor Tracker is made for Google Chrome, and is not expected, nor has it been tested, to work on other browsers.cd
 - While it is possible to see the result of the previous run after closing Cursor Tracker, it cannot be accomplished solely through the GUI. The user has to change "1" to "0" in line 42 of "app.py", run "run_me.py", and then press the "Stop" button. It works, but it is not intuitive.
 
 
