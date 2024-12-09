@@ -31,52 +31,52 @@ The following are parts of the initial specs are currently implemented:
 
 
 ## End User Interaction and Flow Through Code (Walkthrough)
-- The user runs  "run_me.py"
+- The user runs "run_me.py"
   - The GUI appears, the Flask server is started, and data from the previous recording is deleted
-    - run_me.py > start_recording()
+    - `run_me.py > start_recording()`
 - The user types the URL of where they wish to begin into the text box in the GUI
 - User presses the "Start" button
 	- The URL entered and a time stamp are recorded to "URL_clicks.csv"
-		- run_me.py > start_recording()
+		- `run_me.py > start_recording()`
 	- "mouse1.csv" is created
-		- run_me.py > start_recording()
+		- `run_me.py > start_recording()`
 	- In "mouse1.csv" the header text (needed for the heatmap generation) is entered, the upper left and lower right positions are entered (based on the user's screen size), and then the cursor coordinates start being written to it
-		- app.py > track_mouse()
-		- app.py > start()
+		- `app.py > track_mouse()`
+		- `app.py > start()`
 	- A screenshot of the webpage is taken and named
-		- run_me.py > start_recording()
+		- `run_me.py > start_recording()`
 - The user clicks on a link, navigating to a new web page
 	- The URL and a time stamp are logged to "URL_clicks.csv"
-		- app.py > new_url()
+		- `app.py > new_url()`
 	- The time spent on the previous web page is calculated, and then entered into the previous row
-		- app.py > new_url()
+		- `app.py > new_url()`
 	- A screenshot of the new web page is taken
-		- app.py > new_url()
+		- `app.py > new_url()`
 	- A heatmap of the previous web page is rendered
-		- app.py > new_url()
+		- `app.py > new_url()`
 - User continues navigating to new web pages
 	- *repeat of previous section*
 - User concludes their testing, so they pull up the GUI and press the "Stop" button
 	- The time spent on the last web page is calculated and entered into the last row in URL_clicks.csv
-		- run_me.py > stop_recording()
-		- app.py > end_session()
+		- `run_me.py > stop_recording()`
+		- `app.py > end_session()`
 	- The final page number is identified
-		- run_me.py > stop_recording()
+		- `run_me.py > stop_recording()`
 	- The heatmap for the last web page is generated
-		- run_me.py > stop_recording()
+		- `run_me.py > stop_recording()`
 	- The Flask-hosted "results.html" file is opened in the browser
-		- run_me.py > stop_recording()
+		- `run_me.py > stop_recording()`
 - The results of the tracking appear in a new browser tab
 	- The screenshots, heatmaps, and bar chart are loaded
-		- run_me.py > stop_recording()
-		- app.py > index()
-		- app.py > show_results()
-		- app.py > get_image_list()
-		- app.py > get_click_data()
+		- `run_me.py > stop_recording()`
+		- `app.py > index()`
+		- `app.py > show_results()`
+		- `app.py > get_image_list()`
+		- `app.py > get_click_data()`
 - The user is done analyzing the results and closes out of the browser
 - The user closes the GUI window
 	- The Flask server stops and the GUI is closed
-		- run_me.py > on_closing()
+		- `run_me.py > on_closing()`
 
 
 ## Known Issues
