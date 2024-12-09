@@ -82,8 +82,8 @@ The following are parts of the initial specs are currently implemented:
 ## Known Issues
 ### Minor:
  - The following warning message appears "UserWarning: Starting a Matplotlib GUI outside of the main thread will likely fail."
- - Having to pull up the Cursor Tracker GUI to stop the recording could be seen as a negative if the cursor movements on the final web page is important.
- - Rapidly navigating to new web pages may not give the code enough time to take screenshots or generate heatmaps
+ - Rapidly navigating to new web pages may not give the code enough time to take screenshots or generate heatmaps.
+ - Having to pull up the Cursor Tracker GUI to stop the recording could be seen as a negative if the cursor movements on the final web page are important.
 
 ### Major:
 - Cursor Tracker cannot accurately display the cursor position if the user scrolls on a web page. If the user scrolls, the cursor position and screenshot are still recorded, but the heatmap will not be an accurate representation.
