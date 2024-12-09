@@ -66,6 +66,20 @@ LR = screen_width_str+","+screen_height_str
 # Record mouse coordinates in CSV
 #
 def track_mouse():
+    """
+    Continuously tracks the user's mouse coordinates and logs them to a CSV file.
+
+    The CSV file is named based on the `current_page_number` and contains the screen's
+    upper-left and lower-right coordinates as header rows to ensure compatibility
+    with heatmap generation.
+
+    Global Variables:
+        current_page_number (int): Tracks the current webpage number for data storage.
+        page_number_lock (threading.Lock): Ensures thread-safe updates to `current_page_number`.
+
+    Raises:
+        KeyboardInterrupt: Stops mouse tracking when the user interrupts the program.
+    """
     global current_page_number
     try:
         while True:
@@ -95,6 +109,12 @@ mouse_thread.daemon = True  # This ensures the thread will exit when the main pr
 #
 @app.route('/')
 def index():
+    """
+    Displays the main page or redirects to results based on the presence of generated image files.
+
+    Returns:
+        Response: A Flask response object that either redirects to the results page or renders an error page.
+    """
     if len(glob("static/data/*")) > 0:  # if there are any image files in the static folder
         return redirect(url_for('show_results'))
     else:
@@ -105,6 +125,15 @@ def index():
 #
 @app.route('/start', methods=['GET'])
 def start():
+    """
+    Starts the cursor tracking thread and redirects to the provided URL.
+
+    Args:
+        url (str): The URL passed as a query parameter.
+
+    Returns:
+        Response: A redirect to the provided URL or an error message if no URL is supplied.
+    """
     global mouse_thread
     
     # Get the value of the URL from the query parameter
@@ -126,6 +155,13 @@ previous_url = None
 #
 @app.route('/new_url', methods=['POST'])
 def new_url():
+    """
+    Handles new webpage visits by recording URLs, timestamps, and the time spent on pages.
+    Additionally, captures a screenshot and generates a heatmap for the previous webpage.
+
+    Returns:
+        Response: A JSON response indicating success or failure.
+    """
     global current_page_number, previous_timestamp, previous_url
 
     # Get JSON payload
@@ -256,6 +292,12 @@ def new_url():
 #
 @app.route('/end_session', methods=['POST'])
 def end_session():
+    """
+    Ends the session by recording the time spent on the last visited webpage.
+
+    Returns:
+        Response: A JSON response indicating the session has been successfully ended.
+    """
     global previous_timestamp, previous_url
 
     if previous_timestamp is not None and previous_url is not None:
@@ -278,6 +320,12 @@ def end_session():
 #
 @app.route('/show_results', methods=['GET'])
 def show_results():
+    """
+    Lists all heatmap and screenshot images available in the static folder.
+
+    Returns:
+        Response: Renders an HTML template displaying the generated images.
+    """
     os.chdir('static/data')
     image_files = glob('*.png')
     os.chdir('../..')
@@ -289,6 +337,12 @@ def show_results():
 #
 @app.route('/static/data', methods=['GET'])
 def get_image_list():
+    """
+    Retrieves a list of all valid screenshot and heatmap image files.
+
+    Returns:
+        JSON: A list of filenames for valid images.
+    """
     files = glob('static/data/*.png')
     # Filter out "page0" or any invalid pages
     valid_files = [os.path.basename(f) for f in files if "page0" not in f]
@@ -299,6 +353,13 @@ def get_image_list():
 #
 @app.route('/get_click_data', methods=['GET'])
 def get_click_data():
+    """
+    Retrieves click data from the `URL_clicks.csv` file, including URLs and time spent on them.
+
+    Returns:
+        JSON: A list of dictionaries containing URL and time spent data.
+        JSON: An error message if the CSV file cannot be processed.
+    """
     csv_filepath = "data/URL_clicks.csv"
     try:
         # Read CSV and extract URL and time_spent

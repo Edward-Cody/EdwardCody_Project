@@ -29,6 +29,15 @@ screen_height_str = str(screen_height)
 # Function to start the Flask server in a separate thread
 #
 def start_flask_server():
+    """
+    Starts the Flask server in a separate thread.
+
+    This function launches the Flask application (`app.py`) as a subprocess,
+    allowing the GUI to interact with it while remaining responsive.
+
+    Returns:
+        None
+    """
     global flask_process
     flask_process = subprocess.Popen(["python", "app.py"])
     print("Flask server started.")
@@ -37,6 +46,22 @@ def start_flask_server():
 # Function to send the URL to the Flask app, open it, and log it in CSV
 #
 def start_recording():
+    """
+    Initiates recording of user interactions with a specified URL.
+
+    Actions performed:
+    - Records the URL and a timestamp to `URL_clicks.csv`.
+    - Sends the URL to the Flask server to start tracking.
+    - Opens the URL in the default web browser.
+    - Captures a screenshot of the initial web page and saves it.
+
+    Raises:
+        requests.exceptions.ConnectionError: If the Flask server is not running.
+        Exception: For errors during screenshot capturing or general execution.
+
+    Returns:
+        None
+    """
     url = url_entry.get()
     if not url:
         messagebox.showerror("Error", "Please enter a URL.")
@@ -75,6 +100,20 @@ def start_recording():
 # Function to open the "show_results.html" file, adds timestamp to the last row in URL_clicks.csv, and generates the final heatmap
 #
 def stop_recording():
+    """
+    Stops recording and finalizes the data collection process.
+
+    Actions performed:
+    - Calculates and records time spent on the last URL in `URL_clicks.csv`.
+    - Identifies the final page number and generates a heatmap from mouse data.
+    - Opens the results page (`show_results.html`) in the browser.
+
+    Raises:
+        Exception: For errors during heatmap generation or opening results.
+
+    Returns:
+        None
+    """
     global previous_timestamp
 
     # Calculate and record time spent for the last row in URL_clicks.csv
@@ -207,6 +246,15 @@ def stop_recording():
 # Function to stop the Flask server when the GUI is closed
 #
 def on_closing():
+    """
+    Stops the Flask server and closes the GUI.
+
+    When the GUI is closed, this function ensures the Flask server subprocess
+    is terminated gracefully.
+
+    Returns:
+        None
+    """
     if flask_process:
         flask_process.terminate()
         print("Flask server stopped.")
@@ -216,6 +264,15 @@ def on_closing():
 # Function to center the window
 #
 def center_window(window):
+    """
+    Centers a Tkinter window on the screen.
+
+    Args:
+        window (tk.Tk): The Tkinter window to be centered.
+
+    Returns:
+        None
+    """
     window.update_idletasks()  # Ensure the window dimensions are updated
     screen_width = window.winfo_screenwidth()
     screen_height = window.winfo_screenheight()
