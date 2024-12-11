@@ -28,6 +28,7 @@ The following are parts of the initial specs are currently implemented:
 - To give the browser time to load a web page, the code waits 1 second after the "Start" button (in the GUI) is pressed before taking the screenshot of the first webpage. Then, a 0.5 second pause happens before taking a screenshot of each subsequent web page. This means if the user navigates to a new web page very rapidly, or a webpage takes a significant time to load, the screenshot may be inaccurate.
   - To change the delay of the first screenshot, go to line 90 in "run_me.py"
   - To change the delay of all the other screenshots, go to line 229 in "app.py"
+- Ignore the following warning message: "UserWarning: Starting a Matplotlib GUI outside of the main thread will likely fail." The heatmaps are successfully created using matplotlib.
 
 
 ## End User Interaction and Flow Through Code (Walkthrough)
@@ -81,7 +82,6 @@ The following are parts of the initial specs are currently implemented:
 
 ## Known Issues
 ### Minor:
- - The following warning message appears "UserWarning: Starting a Matplotlib GUI outside of the main thread will likely fail."
  - Rapidly navigating to new web pages may not give the code enough time to take screenshots or generate heatmaps.
  - Having to pull up the Cursor Tracker GUI to stop the recording could be seen as a negative if the cursor movements on the final web page are important.
 
